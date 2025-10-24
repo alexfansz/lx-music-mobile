@@ -14,6 +14,7 @@ import settingState from '@/store/setting/state'
 import { checkUpdate } from '@/core/version'
 import { bootLog } from '@/utils/bootLog'
 import { cheatTip } from '@/utils/tools'
+import UPnpCastModule from '@/utils/nativeModules/UPnpCastModule'
 
 let isFirstPush = true
 const handlePushedHomeScreen = async() => {
@@ -64,6 +65,9 @@ export default async() => {
   bootLog('Sync inited.')
 
   // syncSetting()
+
+  // 初始化 DLNA 投播功能
+  UPnpCastModule.init()
 
   isInited ||= true
 
