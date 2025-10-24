@@ -1,3 +1,15 @@
+// 引入 UPnPCast 模块
+dependencyResolutionManagement {
+  versionCatalogs {
+    // 为 UPnPCast 模块定义一个独立版本目录
+    create("upnpcastLibs") {
+      from(files("../../../AndroidPrj/UPnPCast/gradle/libs.versions.toml"))
+    }
+  }
+}
+include(":upnpcast")
+project(":upnpcast").projectDir = file("../../../AndroidPrj/UPnPCast/app")
+
 rootProject.name = 'cn.toside.music.mobile'
 apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 include ':app'
