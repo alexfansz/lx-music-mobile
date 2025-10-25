@@ -9,6 +9,7 @@ import { addDislikeInfo, hasDislike } from '@/core/dislikeList'
 import playerState from '@/store/player/state'
 import musicSdk from '@/utils/musicSdk'
 import { toOldMusicInfo } from '@/utils'
+import UPnpCastModule from '@/utils/nativeModules/UPnpCastModule'
 
 export const handlePlay = (musicInfo: LX.Music.MusicInfoOnline) => {
   void addListMusics(LIST_IDS.DEFAULT, [musicInfo], settingState.setting['list.addMusicLocationType']).then(() => {
@@ -53,3 +54,12 @@ export const handleDislikeMusic = async(musicInfo: LX.Music.MusicInfoOnline) => 
   }
 }
 
+// 新增的投播处理函数
+export const handleCast = (selectInfo: { 
+  musicInfo: LX.Music.MusicInfoOnline, 
+  selectedList: LX.Music.MusicInfoOnline[] 
+}) => {
+  // 不再在这里进行搜索，而是直接返回，让UI组件处理搜索逻辑
+  console.log('准备投播', selectInfo)
+  return selectInfo
+}
