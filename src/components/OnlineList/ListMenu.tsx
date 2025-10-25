@@ -56,7 +56,6 @@ const CastDeviceModal = ({
   const theme = useTheme()
 
   const handleRefresh = () => {
-    // 清空全局设备列表并重新搜索
     globalDeviceList = null
     onSearch()
   }
@@ -78,8 +77,8 @@ const CastDeviceModal = ({
     </TouchableOpacity>
   )
 
-return (
-  <Modal
+  return (
+    <Modal
       visible={visible}
       transparent
       animationType="slide"
@@ -87,10 +86,9 @@ return (
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
-          {/* 添加一个纯白背景视图确保不透明 */}
           <View style={{ 
             ...StyleSheet.absoluteFillObject, 
-            backgroundColor: 'white',
+            backgroundColor: theme.backgroundColor,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             zIndex: -1
@@ -100,14 +98,14 @@ return (
             backgroundColor: theme.backgroundColor 
           }}>
             <View style={styles.modalHeader}>
-              <Text style={{ ...styles.modalTitle, color: theme.fontColor }}>选择投播设备</Text>
+              <Text style={{ ...styles.modalTitle, color: theme.fontColor || '#000000' }}>选择投播设备</Text>
               <View style={styles.headerButtons}>
                 <Button 
                   style={styles.refreshButton} 
                   onPress={handleRefresh} 
                   disabled={searching}
                 >
-                  <Text style={{ color: theme.fontColor }}>
+                  <Text style={{ color: theme.fontColor || '#000000' }}>
                     {searching ? '搜索中...' : '刷新'}
                   </Text>
                 </Button>
@@ -115,23 +113,23 @@ return (
                   style={styles.closeButtonHeader} 
                   onPress={onClose}
                 >
-                  <Text style={{ color: theme.fontColor }}>×</Text>
+                  <Text style={{ color: theme.fontColor || '#000000' }}>×</Text>
                 </Button>
               </View>
             </View>
             
             {searching ? (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={theme.primary} />
-                <Text style={{ color: theme.secondaryFontColor, marginTop: 10 }}>正在搜索设备...</Text>
+                <ActivityIndicator size="large" color={theme.primary || '#007AFF'} />
+                <Text style={{ color: theme.secondaryFontColor || '#666666', marginTop: 10 }}>正在搜索设备...</Text>
               </View>
             ) : devices === null ? (
               <View style={styles.emptyContainer}>
-                <Text style={{ color: theme.secondaryFontColor }}>点击刷新按钮搜索设备</Text>
+                <Text style={{ color: theme.secondaryFontColor || '#666666' }}>点击刷新按钮搜索设备</Text>
               </View>
             ) : devices.length === 0 ? (
               <View style={styles.emptyContainer}>
-                <Text style={{ color: theme.secondaryFontColor }}>未找到可用设备</Text>
+                <Text style={{ color: theme.secondaryFontColor || '#666666' }}>未找到可用设备</Text>
               </View>
             ) : (
               <FlatList
