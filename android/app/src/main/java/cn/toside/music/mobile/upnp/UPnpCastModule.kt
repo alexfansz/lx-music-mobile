@@ -175,9 +175,8 @@ class UPnpCastModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
   }
 
   @ReactMethod
-  fun castToDevice(deviceId: String, url: String, title: String?, promise: Promise) {
-    // 保持未实现，因为它需要 DLNACast.kt 或 CoreManager 提供了通过 ID 查找 Device 的功能。
-    promise.reject("NOT_IMPLEMENTED", "castToDevice needs a Device object that is hard to pass from JS bridge using only ID.")
+  fun castToDevice(deviceId: String, url: String, title: String?, promise: Promise) = runAsync(promise) {
+    DLNACast.findDevice(deviceId)?.let { DLNACast.castToDevice(it,url,title) }
   }
 
   // 3. 进度/音量获取方法
