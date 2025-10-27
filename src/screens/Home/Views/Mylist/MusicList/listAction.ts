@@ -1,5 +1,5 @@
 import { addListMusics, removeListMusics, updateListMusicPosition, updateListMusics } from '@/core/list'
-import { playList, playListById, playNext } from '@/core/player/player'
+import { playList, playListById, playNext, castList } from '@/core/player/player'
 import { addTempPlayList } from '@/core/player/tempPlayList'
 import settingState from '@/store/setting/state'
 import { similar, sortInsert, toOldMusicInfo } from '@/utils'
@@ -14,6 +14,10 @@ import { getListMusicSync } from '@/utils/listManage'
 
 export const handlePlay = (listId: SelectInfo['listId'], index: SelectInfo['index']) => {
   void playList(listId, index)
+}
+// 新增的投播处理函数
+export const handleCast = (listId: SelectInfo['listId'], index: SelectInfo['index']) => {
+  void castList(listId, index)
 }
 export const handlePlayLater = (listId: SelectInfo['listId'], musicInfo: SelectInfo['musicInfo'], selectedList: SelectInfo['selectedList'], onCancelSelect: () => void) => {
   if (selectedList.length) {

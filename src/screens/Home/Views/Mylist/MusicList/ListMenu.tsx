@@ -221,26 +221,11 @@ export default forwardRef<ListMenuType, ListMenuProps>((props, ref) => {
 
   // 选择设备进行投播
   const handleSelectDevice = async (device: {id: string, name: string, address: string, isTV: boolean}) => {
-    try {
-      const musicInfo = selectInfoRef.current.musicInfo
-      // 获取音乐的实际URL
-      const url = musicInfo.meta.filePath || musicInfo.url || ''
-      const title = musicInfo.name
-      
-      if (!url) {
-        toast('无法获取音乐链接')
-        return
-      }
-      
-      toast(`已选择设备: ${device.name}`)
-      setCastModalVisible(false)
-      
-      // 实际的投播逻辑应该在这里实现
-      // 例如：await UPnpCastModule.castToDevice(device.id, url, title)
-    } catch (error) {
-      console.error('投播到设备失败:', error)
-      toast('投播失败')
-    }
+    // 立即关闭设备选择对话框
+    setCastModalVisible(false)
+
+    UPnpCastModule.selectDevice(device.id)
+    props.onCast(selectInfoRef.current)
   }
 
   const handleSetMenu = (musicInfo: LX.Music.MusicInfo) => {
