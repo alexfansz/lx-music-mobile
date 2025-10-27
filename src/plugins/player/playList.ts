@@ -127,14 +127,77 @@ export const updateMetaData = async(musicInfo: LX.Player.MusicInfo, isPlay: bool
   }
 }
 
-const handleCastMusic = async(musicInfo: LX.Player.PlayMusic, url: string, time: number) => {
-// console.log(tracks, time)
-  const tracks = buildTracks(musicInfo, url)
-  const track = tracks[0]
+const generateDidlLiteMetadata = (url: string, title: string, artist: string, album?: string, albumArtURI?: string): string => {
+  // UPnP 对象类别 (默认为音频项目)
+  const upnpClass = "object.item.audioItem.musicTrack";
+  
+  // XML 实体转义函数
+  const escapeXml = (text: string): string => {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  };
+  
+  // 转义输入参数
+  const escapedTitle = escapeXml(title || 'Unknown Title');
+  const escapedArtist = escapeXml(artist || 'Unknown Artist');
+  const escapedAlbum = album ? escapeXml(album) : undefined;
+  const escapedAlbumArtURI = albumArtURI ? escapeXml(albumArtURI) : undefined;
+  
+  // DIDL-Lite 头部
+  let metadata = '<DIDL-Lite xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" xmlns:dc="http://purl.org/dc/elements/1-1/"><item id="0" parentID="-1" restricted="true">';
+  
+  // dc:title - 媒体标题
+  metadata += `<dc:title>${escapedTitle}</dc:title>`;
+  
+  // dc:creator - 艺术家/作者
+  metadata += `<dc:creator>${escapedArtist}</dc:creator>`;
+  
+  // upnp:class - UPnP 媒体类别
+  metadata += `<upnp:class>${upnpClass}</upnp:class>`;
+  
+  // upnp:album - 专辑名称（如果提供）
+  if (escapedAlbum) {
+    metadata += `<upnp:album>${escapedAlbum}</upnp:album>`;
+  }
+  
+  // upnp:artist - 艺术家（UPnP 格式）
+  metadata += `<upnp:artist>${escapedArtist}</upnp:artist>`;
+  
+  // upnp:albumArtURI - 专辑封面 URI（如果提供）
+  if (escapedAlbumArtURI) {
+    metadata += `<upnp:albumArtURI>${escapedAlbumArtURI}</upnp:albumArtURI>`;
+  }
+  
+  // Resource URL (res)
+  // protocolInfo 描述了媒体类型和传输协议
+  metadata += '<res protocolInfo="http-get:*:audio/aac:*">' + escapeXml(url) + '</res>';
+  
+  // DIDL-Lite 尾部
+  metadata += '</item></DIDL-Lite>';
+  
+  return metadata;
+};
 
-  UPnpCastModule.castToDevice(url,".aac")
-  console.log('+++++updateMusicPic+++++', url,track.artwork, track.duration)
-}
+const handleCastMusic = async(musicInfo: LX.Player.PlayMusic, url: string, time: number) => {
+  // 获取音乐信息
+  const mInfo = formatMusicInfo(musicInfo);
+  
+  // 生成 DIDL-Lite 元数据
+  const didlMetadata = generateDidlLiteMetadata(
+    url,
+    mInfo.name || 'Unknown',
+    mInfo.singer || 'Unknown',
+    mInfo.album,
+    (mInfo.pic && httpRxp.test(mInfo.pic)) ? mInfo.pic : undefined
+  );
+  
+  // 调用 castToDevice 并传递元数据字符串
+  UPnpCastModule.castToDevice(url, didlMetadata);
+};
 
 const handlePlayMusic = async(musicInfo: LX.Player.PlayMusic, url: string, time: number) => {
 // console.log(tracks, time)

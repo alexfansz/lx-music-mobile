@@ -181,7 +181,7 @@ class UPnpCastModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
   }
   @ReactMethod
   fun castToDevice(/*deviceId: String,*/ url: String, title: String?, promise: Promise) = runAsync(promise) {
-    DLNACast.findDevice(selectedDevice)?.let { DLNACast.castToDevice(it,url,title) }
+    DLNACast.findDevice(selectedDevice)?.let { DLNACast.castAudioToDevice(it,url,title) }
   }
 
   // 3. 进度/音量获取方法
