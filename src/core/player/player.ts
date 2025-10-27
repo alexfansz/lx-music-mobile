@@ -1,4 +1,4 @@
-import { isInitialized, initial as playerInitial, isEmpty, setPause, setPlay, setResource, setStop } from '@/plugins/player'
+import { isInitialized, initial as playerInitial, isEmpty, setPause, setPlay, setResource, setStop, castResource } from '@/plugins/player'
 import {
   setStatusText,
 } from '@/core/player/playStatus'
@@ -153,6 +153,27 @@ export const setMusicUrl = (musicInfo: LX.Music.MusicInfo | LX.Download.ListItem
   })
 }
 
+export const setTransUrl = (musicInfo: LX.Music.MusicInfo | LX.Download.ListItem, isRefresh?: boolean) => {
+  // addLoadTimeout()
+  if (!diffCurrentMusicInfo(musicInfo)) return
+  if (cancelDelayRetry) cancelDelayRetry()
+  global.lx.gettingUrlId = createGettingUrlId(musicInfo)
+  void getMusicPlayUrl(musicInfo, isRefresh).then((url) => {
+    if (!url) return
+    castResource(musicInfo, url, playerState.progress.nowPlayTime)
+  }).catch((err: any) => {
+    console.log(err)
+    setStatusText(err.message as string)
+    global.app_event.error()
+    addDelayNextTimeout()
+  }).finally(() => {
+    if (musicInfo === playerState.playMusicInfo.musicInfo) {
+      global.lx.gettingUrlId = ''
+      clearLoadTimeout()
+    }
+  })
+}
+
 // 恢复上次播放的状态
 const handleRestorePlay = async(restorePlayInfo: LX.Player.SavedPlayInfo) => {
   const musicInfo = playerState.playMusicInfo.musicInfo
@@ -223,6 +244,10 @@ const debouncePlay = debounceBackgroundTimer((musicInfo: LX.Player.PlayMusic) =>
   })
 }, 200)
 
+const debounceCast = debounceBackgroundTimer((musicInfo: LX.Player.PlayMusic) => {
+  setTransUrl(musicInfo)
+}, 200)
+
 // 处理音乐播放
 const handlePlay = async() => {
   if (!isInitialized()) {
@@ -263,6 +288,45 @@ const handlePlay = async() => {
   debouncePlay(musicInfo)
 }
 
+const handleCast = async() => {
+  if (!isInitialized()) {
+    await checkNotificationPermission()
+    void checkIgnoringBatteryOptimization()
+    await playerInitial({
+      volume: settingState.setting['player.volume'],
+      playRate: settingState.setting['player.playbackRate'],
+      cacheSize: settingState.setting['player.cacheSize'] ? parseInt(settingState.setting['player.cacheSize']) : 0,
+      isHandleAudioFocus: settingState.setting['player.isHandleAudioFocus'],
+      isEnableAudioOffload: settingState.setting['player.isEnableAudioOffload'],
+    })
+  }
+
+  global.lx.isPlayedStop &&= false
+  resetRandomNextMusicInfo()
+
+  if (global.lx.restorePlayInfo) {
+    void handleRestorePlay(global.lx.restorePlayInfo)
+    global.lx.restorePlayInfo = null
+    return
+  }
+
+  const playMusicInfo = playerState.playMusicInfo
+  const musicInfo = playMusicInfo.musicInfo
+
+  if (!musicInfo) return
+
+  await setStop()
+  global.app_event.pause()
+
+  clearDelayNextTimeout()
+  clearLoadTimeout()
+
+
+  if (settingState.setting['player.togglePlayMethod'] == 'random' && !playMusicInfo.isTempPlay) addPlayedList(playMusicInfo as LX.Player.PlayMusicInfo)
+
+  debounceCast(musicInfo)
+}
+
 /**
  * 播放列表内歌曲
  * @param listId 列表id
@@ -291,6 +355,15 @@ export const playList = async(listId: string, index: number) => {
   if (settingState.setting['player.isAutoCleanPlayedList'] || prevListId != listId) clearPlayedList()
   clearTempPlayeList()
   await handlePlay()
+}
+
+export const castList = async(listId: string, index: number) => {
+  const prevListId = playerState.playInfo.playerListId
+  setPlayListId(listId)
+  setPlayMusicInfo(listId, getList(listId)[index])
+  if (settingState.setting['player.isAutoCleanPlayedList'] || prevListId != listId) clearPlayedList()
+  clearTempPlayeList()
+  await handleCast()
 }
 
 const handleToggleStop = async() => {

@@ -1,6 +1,6 @@
 import TrackPlayer, { Capability, Event, RepeatMode, State } from 'react-native-track-player'
 import BackgroundTimer from 'react-native-background-timer'
-import { playMusic as handlePlayMusic } from './playList'
+import { castMusic, playMusic as handlePlayMusic } from './playList'
 import { existsFile, moveFile, privateStorageDirectoryPath, temporaryDirectoryPath } from '@/utils/fs'
 import { toast } from '@/utils/tools'
 // import { PlayerMusicInfo } from '@/store/modules/player/playInfo'
@@ -152,6 +152,10 @@ const playMusic = ((fn: (musicInfo: LX.Player.PlayMusic, url: string, time: numb
 
 export const setResource = (musicInfo: LX.Player.PlayMusic, url: string, duration?: number) => {
   playMusic(musicInfo, url, duration ?? 0)
+}
+
+export const castResource = (musicInfo: LX.Player.PlayMusic, url: string, duration?: number) => {
+  castMusic(musicInfo, url, duration ?? 0)
 }
 
 export const setPlay = async() => TrackPlayer.play()

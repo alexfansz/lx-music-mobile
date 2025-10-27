@@ -56,6 +56,7 @@ export {
 
 export {
   setResource,
+  castResource,
   setPause,
   setPlay,
   setCurrentTime,

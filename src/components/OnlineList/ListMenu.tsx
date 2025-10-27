@@ -195,7 +195,7 @@ export default forwardRef<ListMenuType, ListMenuProps>((props: ListMenuProps, re
   }
 
   // 处理投播操作
-  const handleCast = (selectInfo: SelectInfo) => {
+  const handleCast = () => {
     // 先显示对话框
     setCastModalVisible(true)
     setDevices(null) // 重置设备列表
@@ -209,26 +209,11 @@ export default forwardRef<ListMenuType, ListMenuProps>((props: ListMenuProps, re
 
   // 选择设备进行投播
   const handleSelectDevice = async (device: {id: string, name: string, address: string, isTV: boolean}) => {
-    try {
-      const musicInfo = selectInfoRef.current.musicInfo
-      // 这里需要获取音乐的实际URL，根据项目结构可能需要调用其他方法
-      const url = musicInfo.url || musicInfo.songmid || ''
-      const title = musicInfo.name
-      
-      if (!url) {
-        toast('无法获取音乐链接')
-        return
-      }
-      
-      toast(`已选择设备: ${device.name}`)
-      setCastModalVisible(false)
-      
-      // 实际的投播逻辑应该在这里实现
-      // 例如：await UPnpCastModule.castToDevice(device.id, url, title)
-    } catch (error) {
-      console.error('投播到设备失败:', error)
-      toast('投播失败')
-    }
+    // 立即关闭设备选择对话框
+    setCastModalVisible(false)
+
+    UPnpCastModule.selectDevice(device.id)
+    props.onCast(selectInfoRef.current)
   }
 
   const menus = useMemo(() => {
@@ -260,8 +245,7 @@ export default forwardRef<ListMenuType, ListMenuProps>((props: ListMenuProps, re
         props.onCopyName(selectInfo)
         break
       case 'cast': // 处理投播操作
-        props.onCast(selectInfo)
-        handleCast(selectInfo)
+        handleCast()
         break
       case 'musicSourceDetail':
         props.onMusicSourceDetail(selectInfo)

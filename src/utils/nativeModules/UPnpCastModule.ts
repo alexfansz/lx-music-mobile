@@ -39,7 +39,8 @@ interface UPnpCastModuleInterface {
   setMute: (mute: boolean) => Promise<void>
   seek: (positionMs: number) => Promise<void>
   search: (timeout: number) => Promise<Device[]>
-  castToDevice: (deviceId: string, url: string, title: string | null) => Promise<void>
+  selectDevice: (deviceId: string) => void
+  castToDevice: (url: string, title: string | null) => Promise<void>
   getProgress: () => Promise<Progress | null>
   getProgressRealtime: () => Promise<Progress | null>
   getVolume: () => Promise<VolumeData | null>
@@ -63,6 +64,7 @@ const defaultImpl: UPnpCastModuleInterface = {
   setMute: () => Promise.resolve(),
   seek: () => Promise.resolve(),
   search: () => Promise.resolve([]),
+  selectDevice: () => {},
   castToDevice: () => Promise.resolve(),
   getProgress: () => Promise.resolve(null),
   getProgressRealtime: () => Promise.resolve(null),

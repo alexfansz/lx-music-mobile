@@ -111,7 +111,7 @@ export default forwardRef<OnlineListType, OnlineListProps>(({
         onAdd={handleAddMusic}
         onMusicSourceDetail={info => { void handleShowMusicSourceDetail(info.musicInfo) }}
         onDislikeMusic={info => { void handleDislikeMusic(info.musicInfo) }}
-        onCast={handleCast} // 添加这一行
+        onCast={info => {handleCast((info.musicInfo))} } // 添加这一行
       />
       {/* <LoadingMask ref={loadingMaskRef} /> */}
     </View>

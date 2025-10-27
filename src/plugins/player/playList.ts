@@ -3,7 +3,7 @@ import BackgroundTimer from 'react-native-background-timer'
 import { defaultUrl } from '@/config'
 // import { action as playerAction } from '@/store/modules/player'
 import settingState from '@/store/setting/state'
-
+import UPnpCastModule from '@/utils/nativeModules/UPnpCastModule'
 
 const list: LX.Player.Track[] = []
 
@@ -127,6 +127,15 @@ export const updateMetaData = async(musicInfo: LX.Player.MusicInfo, isPlay: bool
   }
 }
 
+const handleCastMusic = async(musicInfo: LX.Player.PlayMusic, url: string, time: number) => {
+// console.log(tracks, time)
+  const tracks = buildTracks(musicInfo, url)
+  const track = tracks[0]
+
+  UPnpCastModule.castToDevice(url,".aac")
+  console.log('+++++updateMusicPic+++++', url,track.artwork, track.duration)
+}
+
 const handlePlayMusic = async(musicInfo: LX.Player.PlayMusic, url: string, time: number) => {
 // console.log(tracks, time)
   const tracks = buildTracks(musicInfo, url)
@@ -170,6 +179,14 @@ export const playMusic = (musicInfo: LX.Player.PlayMusic, url: string, time: num
   void playPromise.finally(() => {
     if (id != actionId) return
     playPromise = handlePlayMusic(musicInfo, url, time)
+  })
+}
+
+export const castMusic = (musicInfo: LX.Player.PlayMusic, url: string, time: number) => {
+  const id = actionId = Math.random()
+  void playPromise.finally(() => {
+    if (id != actionId) return
+    playPromise = handleCastMusic(musicInfo, url, time)
   })
 }
 

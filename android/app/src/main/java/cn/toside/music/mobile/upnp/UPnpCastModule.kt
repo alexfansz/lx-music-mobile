@@ -1,9 +1,9 @@
 package cn.toside.music.mobile.upnp
 
+import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.WritableNativeArray
 import com.facebook.react.bridge.WritableNativeMap
 import com.yinnho.upnpcast.DLNACast
@@ -17,6 +17,7 @@ class UPnpCastModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
 
   // 使用 IO 调度器来执行耗时操作，例如网络调用 (UPnP/DLNA)
   private val moduleScope = CoroutineScope(Dispatchers.IO)
+  private var selectedDevice: String = ""
 
   // 暴露给 JavaScript 的模块名称
   override fun getName() = "UPnpCastFunctions"
@@ -175,8 +176,12 @@ class UPnpCastModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
   }
 
   @ReactMethod
-  fun castToDevice(deviceId: String, url: String, title: String?, promise: Promise) = runAsync(promise) {
-    DLNACast.findDevice(deviceId)?.let { DLNACast.castToDevice(it,url,title) }
+  fun selectDevice(id: String){
+    selectedDevice = id
+  }
+  @ReactMethod
+  fun castToDevice(/*deviceId: String,*/ url: String, title: String?, promise: Promise) = runAsync(promise) {
+    DLNACast.findDevice(selectedDevice)?.let { DLNACast.castToDevice(it,url,title) }
   }
 
   // 3. 进度/音量获取方法
