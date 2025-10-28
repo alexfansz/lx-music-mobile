@@ -8,3 +8,4 @@ export const SYNC_MODE_MODAL = 'lxm.SyncModeModal'
 // export const SETTING_SCREEN = 'lxm.SettingScreen'
 // export const TOAST_SCREEN = 'lxm.ToastScreen'
 
+export const DLNA_CONTROL_SCREEN = 'DLNA_CONTROL_SCREEN'

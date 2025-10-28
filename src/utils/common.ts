@@ -242,3 +242,10 @@ export const b64DecodeUnicode = (str: string) => {
   // Going backwards: from bytestream, to percent-encoding, to original string.
   return Buffer.from(str, 'base64').toString()
 }
+
+// src/utils/common.ts
+export function formatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60)
+  const secs = Math.floor(seconds % 60)
+  return `${mins}:${secs < 10 ? '0' : ''}${secs}`
+}

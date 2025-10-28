@@ -1,15 +1,40 @@
 
 import { memo } from 'react'
 
-import Slider, { type SliderProps } from '@react-native-community/slider'
+//import Slider, { type SliderProps } from '@react-native-community/slider'
+import Slider from '@react-native-community/slider'
+
 import { useTheme } from '@/store/theme/hook'
 import { createStyle } from '@/utils/tools'
 
-export type {
-  SliderProps,
+// 定义完整的自定义Slider属性类型
+interface SliderProps {
+  value?: number
+  minimumValue?: number
+  maximumValue?: number
+  onSlidingStart?: (value: number) => void
+  onSlidingComplete?: (value: number) => void
+  onValueChange?: (value: number) => void
+  step?: number
+  thumbTintColor?: string
+  minimumTrackTintColor?: string
+  maximumTrackTintColor?: string
 }
 
-export default memo(({ value, minimumValue, maximumValue, onSlidingStart, onSlidingComplete, onValueChange, step }: SliderProps) => {
+export type { SliderProps }
+
+export default memo(({ 
+  value, 
+  minimumValue, 
+  maximumValue, 
+  onSlidingStart, 
+  onSlidingComplete, 
+  onValueChange, 
+  step,
+  thumbTintColor,
+  minimumTrackTintColor,
+  maximumTrackTintColor
+}: SliderProps) => {
   const theme = useTheme()
 
   return (
@@ -18,9 +43,9 @@ export default memo(({ value, minimumValue, maximumValue, onSlidingStart, onSlid
       style={styles.slider}
       minimumValue={minimumValue}
       maximumValue={maximumValue}
-      minimumTrackTintColor={theme['c-button-background-active']}
-      maximumTrackTintColor={theme['c-button-background']}
-      thumbTintColor={theme['c-primary-light-100']}
+      minimumTrackTintColor={minimumTrackTintColor ?? theme['c-button-background-active']}
+      maximumTrackTintColor={maximumTrackTintColor ?? theme['c-button-background']}
+      thumbTintColor={thumbTintColor ?? theme['c-primary-light-100']}
       onSlidingStart={onSlidingStart}
       onSlidingComplete={onSlidingComplete}
       onValueChange={onValueChange}

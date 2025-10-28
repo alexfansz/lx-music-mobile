@@ -4,6 +4,7 @@ import { defaultUrl } from '@/config'
 // import { action as playerAction } from '@/store/modules/player'
 import settingState from '@/store/setting/state'
 import UPnpCastModule from '@/utils/nativeModules/UPnpCastModule'
+import setDlnaDevice  from '@/store/dlna/action'
 
 const list: LX.Player.Track[] = []
 
@@ -183,6 +184,19 @@ const generateDidlLiteMetadata = (url: string, title: string, artist: string, al
 };
 
 const handleCastMusic = async(musicInfo: LX.Player.PlayMusic, url: string, time: number) => {
+  // 先清除旧的音乐信息
+  setDlnaDevice.setDlnaMusicInfo({
+    id: undefined,
+    name: undefined,
+    singer: undefined,
+    album: undefined,
+    pic: undefined,
+    duration: undefined
+  });
+  
+  // 确保状态更新完成后再继续
+  await new Promise(resolve => setTimeout(resolve, 0));
+  
   // 获取音乐信息
   const mInfo = formatMusicInfo(musicInfo);
   
@@ -194,6 +208,16 @@ const handleCastMusic = async(musicInfo: LX.Player.PlayMusic, url: string, time:
     mInfo.album,
     (mInfo.pic && httpRxp.test(mInfo.pic)) ? mInfo.pic : undefined
   );
+
+  // 修复：将 null 转为 undefined，避免类型不匹配
+  const safePic = mInfo.pic ?? undefined;
+  
+  // 设置新的音乐信息
+  setDlnaDevice.setDlnaMusicInfo({
+    ...mInfo,
+    pic: safePic,
+  });
+  setDlnaDevice.setDlnaPlayState(true)
   
   // 调用 castToDevice 并传递元数据字符串
   UPnpCastModule.castToDevice(url, didlMetadata);

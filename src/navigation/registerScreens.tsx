@@ -8,6 +8,7 @@ import {
   SonglistDetail,
   Comment,
   // Setting,
+  DlnaControl, 
 } from '@/screens'
 import { Provider } from '@/store/Provider'
 
@@ -20,6 +21,7 @@ import {
   PACT_MODAL,
   SYNC_MODE_MODAL,
   // SETTING_SCREEN,
+  DLNA_CONTROL_SCREEN,
 } from './screenNames'
 import VersionModal from './components/VersionModal'
 import PactModal from './components/PactModal'
@@ -42,6 +44,7 @@ function WrappedComponent(Component: any) {
 export default () => {
   Navigation.registerComponent(HOME_SCREEN, () => WrappedComponent(Home))
   Navigation.registerComponent(PLAY_DETAIL_SCREEN, () => WrappedComponent(PlayDetail))
+  Navigation.registerComponent(DLNA_CONTROL_SCREEN, () => WrappedComponent(DlnaControl))
   Navigation.registerComponent(SONGLIST_DETAIL_SCREEN, () => WrappedComponent(SonglistDetail))
   Navigation.registerComponent(COMMENT_SCREEN, () => WrappedComponent(Comment))
   Navigation.registerComponent(VERSION_MODAL, () => WrappedComponent(VersionModal))

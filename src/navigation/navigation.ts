@@ -7,6 +7,7 @@ import {
   SONGLIST_DETAIL_SCREEN,
   COMMENT_SCREEN,
   // SETTING_SCREEN,
+  DLNA_CONTROL_SCREEN,
 } from './screenNames'
 
 import themeState from '@/store/theme/state'
@@ -588,3 +589,83 @@ export function pushTabBasedApp() {
   })
 }
  */
+
+
+
+// 首先需要导入 DLNA_CONTROL_SCREEN 常量
+// 假设在 screenNames.ts 中已经定义了 DLNA_CONTROL_SCREEN
+
+export function pushDlnaControlScreen(componentId: string, skipAnimation = false) {
+  requestAnimationFrame(() => {
+    const theme = themeState.theme
+
+    void Navigation.push(componentId, {
+      component: {
+        name: DLNA_CONTROL_SCREEN, // 需要确保这个常量已在 screenNames.ts 中定义
+        options: {
+          topBar: {
+            visible: false,
+            height: 0,
+            drawBehind: false,
+          },
+          statusBar: {
+            drawBehind: true,
+            visible: true,
+            style: getStatusBarStyle(theme.isDark),
+            backgroundColor: 'transparent',
+          },
+          navigationBar: {
+            backgroundColor: theme['c-content-background'],
+          },
+          layout: {
+            componentBackgroundColor: theme['c-content-background'],
+          },
+          animations: {
+            push: skipAnimation ? {} : {
+              sharedElementTransitions: [
+                {
+                  fromId: NAV_SHEAR_NATIVE_IDS.playDetail_pic,
+                  toId: NAV_SHEAR_NATIVE_IDS.playDetail_pic,
+                  interpolation: { type: 'spring' },
+                },
+              ],
+              elementTransitions: [
+                {
+                  id: NAV_SHEAR_NATIVE_IDS.playDetail_header,
+                  alpha: {
+                    from: 0,
+                    duration: 300,
+                  },
+                  translationY: {
+                    from: -32,
+                    duration: 300,
+                  },
+                },
+                {
+                  id: NAV_SHEAR_NATIVE_IDS.playDetail_player,
+                  alpha: {
+                    from: 0,
+                    duration: 300,
+                  },
+                  translationY: {
+                    from: 32,
+                    duration: 300,
+                  },
+                },
+              ],
+            },
+            pop: {
+              content: {
+                translationX: {
+                  from: 0,
+                  to: windowSizeTools.getSize().width,
+                  duration: 300,
+                },
+              },
+            },
+          },
+        },
+      },
+    })
+  })
+}

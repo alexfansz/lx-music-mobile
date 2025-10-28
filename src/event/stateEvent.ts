@@ -4,6 +4,7 @@ import type { InitState as ListState } from '@/store/list/state'
 import type { InitState as PlayerState } from '@/store/player/state'
 import type { InitState as VersionState } from '@/store/version/state'
 import { type I18n } from '@/lang'
+import type { DlnaDevice, DlnaMusicInfo } from '@/store/dlna/state'
 
 
 // {
@@ -16,6 +17,30 @@ import { type I18n } from '@/lang'
 // }
 
 export class StateEvent extends Event {
+    // DLNA 相关事件
+  dlnaDeviceChanged(device: DlnaDevice | null) {
+    this.emit('dlnaDeviceChanged', device)
+  }
+
+  dlnaMusicInfoChanged(musicInfo: DlnaMusicInfo | null) {
+    this.emit('dlnaMusicInfoChanged', musicInfo)
+  }
+
+  dlnaPlayStateChanged(state: boolean) {
+    this.emit('dlnaPlayStateChanged', state)
+  }
+
+  dlnaProgressChanged(progress: {
+    currentTime: number
+    totalTime: number
+    progress: number
+    currentTimeStr: string
+    totalTimeStr: string
+  }) {
+    this.emit('dlnaProgressChanged', progress)
+  }
+  //===================
+
   configUpdated(keys: Array<keyof LX.AppSetting>, setting: Partial<LX.AppSetting>) {
     this.emit('configUpdated', keys, setting)
   }

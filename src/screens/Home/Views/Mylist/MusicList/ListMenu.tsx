@@ -9,6 +9,9 @@ import { useTheme } from '@/store/theme/hook'
 import Button from '@/components/common/Button'
 import UPnpCastModule from '@/utils/nativeModules/UPnpCastModule'
 import { toast } from '@/utils/tools'
+import { navigations } from '@/navigation'
+import commonState from '@/store/common/state'
+import setDlnaDevice  from '@/store/dlna/action'
 
 export interface SelectInfo {
   musicInfo: LX.Music.MusicInfo
@@ -69,12 +72,15 @@ const CastDeviceModal = ({
 
   const renderItem = ({ item }: { item: {id: string, name: string, address: string, isTV: boolean} }) => (
     <TouchableOpacity 
-      style={{ ...styles.deviceItem, backgroundColor: theme.primaryLight }} 
+      style={{ 
+      ...styles.deviceItem, 
+      backgroundColor: (theme['c-primary'] as { light?: string; dark?: string; })?.light ?? '#f0f0f0' 
+    }}
       onPress={() => onSelectDevice(item)}
     >
       <View style={styles.deviceInfo}>
-        <Text style={{ ...styles.deviceName, color: theme.fontColor }}>{item.name}</Text>
-        <Text style={{ ...styles.deviceAddress, color: theme.secondaryFontColor }}>{item.address}</Text>
+        <Text style={{ ...styles.deviceName, color: theme['c-font'] ?? '#000000' }}>{item.name}</Text>
+        <Text style={{ ...styles.deviceAddress, color: theme['c-font-label'] || '#666666' }}>{item.address}</Text>
       </View>
       {item.isTV && (
         <View style={styles.tvTag}>
@@ -95,24 +101,24 @@ const CastDeviceModal = ({
         <View style={styles.modalContainer}>
           <View style={{ 
             ...StyleSheet.absoluteFillObject, 
-            backgroundColor: theme.backgroundColor,
+            backgroundColor: theme['c-content-background'],
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             zIndex: -1
           }} />
           <View style={{ 
             ...styles.modalContent, 
-            backgroundColor: theme.backgroundColor 
+            backgroundColor: theme['c-content-background']
           }}>
             <View style={styles.modalHeader}>
-              <Text style={{ ...styles.modalTitle, color: theme.fontColor || '#000000' }}>选择投播设备</Text>
+              <Text style={{ ...styles.modalTitle, color: theme['c-font'] ?? '#000000' }}>选择投播设备</Text>
               <View style={styles.headerButtons}>
                 <Button 
                   style={styles.refreshButton} 
                   onPress={handleRefresh} 
                   disabled={searching}
                 >
-                  <Text style={{ color: theme.fontColor || '#000000' }}>
+                  <Text style={{ color: theme['c-font'] ?? '#000000' }}>
                     {searching ? '搜索中...' : '刷新'}
                   </Text>
                 </Button>
@@ -120,23 +126,23 @@ const CastDeviceModal = ({
                   style={styles.closeButtonHeader} 
                   onPress={onClose}
                 >
-                  <Text style={{ color: theme.fontColor || '#000000' }}>×</Text>
+                  <Text style={{ color: theme['c-font'] ?? '#000000' }}>×</Text>
                 </Button>
               </View>
             </View>
             
             {searching ? (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={theme.primary || '#007AFF'} />
-                <Text style={{ color: theme.secondaryFontColor || '#666666', marginTop: 10 }}>正在搜索设备...</Text>
+                <ActivityIndicator size="large" color={theme['c-primary'] || '#007AFF'} />
+                <Text style={{ color: theme['c-font-label'] || '#666666', marginTop: 10 }}>正在搜索设备...</Text>
               </View>
             ) : devices === null ? (
               <View style={styles.emptyContainer}>
-                <Text style={{ color: theme.secondaryFontColor || '#666666' }}>点击刷新按钮搜索设备</Text>
+                <Text style={{ color: theme['c-font-label'] || '#666666' }}>点击刷新按钮搜索设备</Text>
               </View>
             ) : devices.length === 0 ? (
               <View style={styles.emptyContainer}>
-                <Text style={{ color: theme.secondaryFontColor || '#666666' }}>未找到可用设备</Text>
+                <Text style={{ color: theme['c-font-label'] || '#666666' }}>未找到可用设备</Text>
               </View>
             ) : (
               <FlatList
@@ -224,6 +230,17 @@ export default forwardRef<ListMenuType, ListMenuProps>((props, ref) => {
     // 立即关闭设备选择对话框
     setCastModalVisible(false)
 
+    // 在设备选择成功后再设置设备信息
+    setDlnaDevice.setDlnaDevice({
+      id: device.id,
+      name: device.name,
+      address: device.address,
+      isTV: device.isTV
+    })
+    // 导航到 DLNA 控制页面
+    navigations.pushDlnaControlScreen(commonState.componentIds.home!)
+
+    // 选择设备并等待操作完成
     UPnpCastModule.selectDevice(device.id)
     props.onCast(selectInfoRef.current)
   }
